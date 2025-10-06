@@ -1,0 +1,19 @@
+# ---- Python backend ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.venv/
+env/
+venv/
+
+# ---- Node frontend ----
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env
+frontend/.DS_Store
+
+# ---- macOS / General ----
+.DS_Store
+*.log
