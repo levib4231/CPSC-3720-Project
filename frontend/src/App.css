@@ -13,15 +13,20 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .App-logo {
+    animation: none;
+  }
+}
 .App-header {
-  background-color: #282c34;
+  background-color: #1f2530;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #f2f2f2;
 }
 
 .App-link {
@@ -40,25 +45,27 @@
 button:focus,
 a:focus,
 input:focus {
-  outline: 3px solid #005fcc;
+  outline: 3px solid #ff9800;   /* Bright, high-contrast color */
   outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .skip-link {
   position: absolute;
   top: -40px;
   left: 0;
-  background: #000;
-  color: #fff;
-  padding: 8px;
+  background: #004080;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  text-decoration: none;
   z-index: 100;
   transition: top 0.3s;
-  text-decoration: none;
-}
-.skip-link:focus {
-  top: 0;
 }
 
+.skip-link:focus {
+  top: 10px; /* Slide down when focused */
+}
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -68,4 +75,19 @@ input:focus {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+.confirmation-message {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #e6ffe6;
+  border: 1px solid #00aa00;
+  border-radius: 8px;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.confirmation-message:focus {
+  outline: 3px solid #00aa00;
+  outline-offset: 4px;
 }

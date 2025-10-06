@@ -14,7 +14,7 @@ function App() {
 
     const buyTicket = (eventName) => {
         setStatusMessage(`Ticket purchased for: ${eventName}`);
-        alert(`Ticket purchased for: ${eventName}`);
+        setTimeout(() => setStatusMessage(''), 4000);
     };
 
     return (
@@ -29,30 +29,39 @@ function App() {
                     <h1>Clemson Campus Events</h1>
                 </header>
 
-                <main id="main-content" aria-live="polite">
-                    <h2>Upcoming Events</h2>
-                    <ul>
-                        {events.map((event) => (
-                            <li key={event.id}>
-                                <span>{event.name}</span> – <span>{event.date}</span>{' '}
-                                <button
-                                    onClick={() => buyTicket(event.name)}
-                                    aria-label={`Buy ticket for ${event.name}`}
-                                >
-                                    Buy Ticket
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
+                <main id="main-content" aria-live="polite" role="main">
+                    <h2 id="upcoming-events">Upcoming Events</h2>
+                    <section aria-labelledby="upcoming-events">
+                        <ul role="list">
+                            {events.map((event) => (
+                                <li key={event.id}>
+                                    <span>{event.name}</span> – <span>{event.date}</span>{' '}
+                                    <button
+                                        onClick={() => buyTicket(event.name)}
+                                        aria-label={`Buy ticket for ${event.name}`}
+                                    >
+                                        Buy Ticket
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
 
-                    {/* Live region for feedback */}
-                    <div
-                        aria-live="polite"
-                        role="status"
-                        className="visually-hidden"
-                    >
+                    {/* Hidden live region for screen readers */}
+                    <div aria-live="polite" role="status" className="visually-hidden">
                         {statusMessage}
                     </div>
+
+                    {statusMessage && (
+                        <p
+                            ref={confirmationRef}
+                            tabIndex="-1"
+                            role="alert"
+                            className="confirmation-message"
+                        >
+                            {statusMessage}
+                        </p>
+                    )}
                 </main>
 
                 <footer>
@@ -62,5 +71,4 @@ function App() {
         </>
     );
 }
-
 export default App;
