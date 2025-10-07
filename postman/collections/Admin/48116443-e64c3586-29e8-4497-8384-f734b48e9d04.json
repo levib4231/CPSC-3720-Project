@@ -4,5 +4,40 @@
 		"name": "Admin",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
-	"item": []
+	"item": [
+		{
+			"name": "Post Event",
+			"id": "48116443-fd477974-b50e-420e-8546-be12223a9d09",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Homecoming Concert\",\n  \"date\": \"2025-10-20\",\n  \"tickets\": 150\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/api/admin/events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"admin",
+						"events"
+					]
+				}
+			},
+			"response": []
+		}
+	]
 }
