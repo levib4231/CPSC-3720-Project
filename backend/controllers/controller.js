@@ -5,5 +5,3 @@ const events = getEvents();
 res.json(events);
 };
 module.exports = { listEvents };
-
-//test comment
