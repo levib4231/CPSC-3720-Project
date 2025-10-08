@@ -62,32 +62,6 @@
 				}
 			},
 			"response": []
-		},
-		{
-			"name": "Purchase Ticket",
-			"id": "48116443-98d9ddf4-5e5e-43dd-9e16-6ed0bdf8fb1c",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:6001/api/events/1/purchase",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "6001",
-					"path": [
-						"api",
-						"events",
-						"1",
-						"purchase"
-					]
-				}
-			},
-			"response": []
 		}
 	]
 }
