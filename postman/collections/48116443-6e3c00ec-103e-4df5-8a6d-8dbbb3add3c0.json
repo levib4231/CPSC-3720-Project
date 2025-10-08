@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "get",
+			"name": "Get Events",
 			"id": "48116443-053c7876-2dee-48c2-a6f0-cca1b560814a",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
