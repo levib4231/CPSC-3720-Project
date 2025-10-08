@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const sqlite3 = require("sqlite3").verbose();
 
-const dbPath = path.resolve(__dirname, "../shared-db/database.sqlite");
+const dbPath = path.resolve(__dirname, "../../shared-db/database.sqlite");
 
 const dbDir = path.dirname(dbPath);
 if (!fs.existsSync(dbDir)) {
