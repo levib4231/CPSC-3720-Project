@@ -40,7 +40,7 @@
 			"response": []
 		},
 		{
-			"name": "New Request",
+			"name": "Get All Events",
 			"id": "48116443-ecc96a1f-b1fb-4772-b124-969b6192d0ee",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
