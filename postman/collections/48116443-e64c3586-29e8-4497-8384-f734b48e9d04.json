@@ -70,10 +70,10 @@
 				"disableBodyPruning": true
 			},
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:6001/api/events/:id/purchase",
+					"raw": "http://localhost:6001/api/events/1/purchase",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -82,14 +82,8 @@
 					"path": [
 						"api",
 						"events",
-						":id",
+						"1",
 						"purchase"
-					],
-					"variable": [
-						{
-							"key": "id",
-							"value": ""
-						}
 					]
 				}
 			},
