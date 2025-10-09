@@ -28,6 +28,18 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Purchase Tickets",
+			"id": "48116443-e7d86149-a3d7-495c-b9b6-709a46cc6832",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	]
 }
