@@ -6,7 +6,7 @@ const { listEvents, purchaseEvent } = require("../controllers/clientController")
 router.get("/events", listEvents);
 
 // POST /api/events/:id/purchase - Purchase a ticker for an event 
-router.post("/events/id:/purchase", purchaseEvent);
+router.post("/events/:id/purchase", purchaseEvent);
 
 module.exports = router;
 

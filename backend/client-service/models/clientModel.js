@@ -46,7 +46,7 @@ exports.purchaseTicket = (eventId) => {
 
         // First checks if the event exists and has tickets available
         db.get(
-          "SELECT id, name, tickets_available FROM events WHERE id = ?",
+          "SELECT id, name, tickets FROM events WHERE id = ?",
           [eventId],
           (err, row) => {
             if (err) {
@@ -60,7 +60,7 @@ exports.purchaseTicket = (eventId) => {
               return reject(new Error("EVENT_NOT_FOUND"));
             }
 
-            if (row.tickets_available <= 0) {
+            if (row.tickets <= 0) {
               db.run("ROLLBACK");
               return reject(new Error("SOLD_OUT"));
             }
@@ -69,8 +69,8 @@ exports.purchaseTicket = (eventId) => {
             // Ensures we only update if tickets are still available
             db.run(
               `UPDATE events 
-               SET tickets_available = tickets_available - 1 
-               WHERE id = ? AND tickets_available > 0`,
+               SET tickets = tickets - 1 
+               WHERE id = ? AND tickets > 0`,
               [eventId],
               function (err) {
                 if (err) {
@@ -96,7 +96,7 @@ exports.purchaseTicket = (eventId) => {
                     success: true,
                     eventId: eventId,
                     eventName: row.name,
-                    remainingTickets: row.tickets_available - 1,
+                    remainingTickets: row.tickets - 1,
                   });
                 });
               }
