@@ -7,7 +7,7 @@ function App() {
     const confirmationRef = useRef(null); 
 
     useEffect(() => {
-        fetch('http://localhost:5001/api/events')
+        fetch('http://localhost:6001/api/events')
             .then((res) => res.json())
             .then((data) => setEvents(data))
             .catch((err) => console.error(err));
