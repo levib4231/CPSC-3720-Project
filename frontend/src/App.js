@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './App.css';
 
+
 function App() {
   const [events, setEvents] = useState([]);
   const [statusMessage, setStatusMessage] = useState('');
