@@ -44,6 +44,11 @@ function App() {
         if (confirmationRef.current) confirmationRef.current.focus();
       }, 100);
     }
+
+    fetch('http://localhost:6001/api/events')
+      .then((res) => res.json())
+      .then((data) => setEvents(data))
+      .catch((err) => console.error('Failed to load events:', err));
   };
 
   return (
