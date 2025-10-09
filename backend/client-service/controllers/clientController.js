@@ -1,5 +1,4 @@
 const { getAllEvents, purchaseTicket} = require ("../models/clientModel");
-const { get } = require("../routes/clientRoutes");
 
 /**
  *  GET /api/events - List all events 

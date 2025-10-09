@@ -20,7 +20,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
  */
 exports.getAllEvents = () => {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM events ORDER BY date_iso ASC", [], (err, rows) => {
+        db.all("SELECT * FROM events ORDER BY date ASC", [], (err, rows) => {
             if (err) {
                 return reject(err);
             }
