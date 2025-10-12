@@ -1,12 +1,31 @@
+/**
+ * App.css
+ * 
+ * Purpose:
+ *   Defines the core layout, accessibility, and interaction styles
+ *   for the Clemson Campus Events React application.
+ *
+ * Standards Addressed:
+ *   - Consistent formatting (2-space indentation, grouped sections)
+ *   - Accessibility: high-contrast focus outlines, skip links, visually hidden elements
+ *   - Reusability: class-based modular selectors
+ *   - Responsiveness: media queries for motion preferences
+ */
+
+/* -------------------- Base App Layout -------------------- */
+
 .App {
   text-align: center;
 }
+
+/* -------------------- Logo Animation -------------------- */
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
 
+/* Animate logo unless user prefers reduced motion */
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -18,6 +37,9 @@
     animation: none;
   }
 }
+
+/* -------------------- Header -------------------- */
+
 .App-header {
   background-color: #1f2530;
   min-height: 100vh;
@@ -29,32 +51,36 @@
   color: #f2f2f2;
 }
 
+/* -------------------- Links -------------------- */
+
 .App-link {
   color: #61dafb;
+  text-decoration: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App-link:hover,
+.App-link:focus {
+  text-decoration: underline;
 }
 
+/* -------------------- Focus Styles -------------------- */
+
+/* High-contrast outlines for accessibility */
 button:focus,
 a:focus,
 input:focus {
-  outline: 3px solid #ff9800;   /* Bright, high-contrast color */
+  outline: 3px solid #ff9800; /* Bright, visible color */
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* -------------------- Skip Link (Keyboard Navigation) -------------------- */
 
 .skip-link {
   position: absolute;
   top: -40px;
   left: 0;
-  background: #004080;
+  background-color: #004080;
   color: white;
   padding: 8px 12px;
   border-radius: 4px;
@@ -63,9 +89,13 @@ input:focus {
   transition: top 0.3s;
 }
 
+/* Reveal skip link when focused */
 .skip-link:focus {
   top: 10px; /* Slide down when focused */
 }
+
+/* -------------------- Utility: Visually Hidden -------------------- */
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -77,6 +107,8 @@ input:focus {
   border: 0;
 }
 
+/* -------------------- Confirmation Message -------------------- */
+
 .confirmation-message {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
@@ -87,7 +119,19 @@ input:focus {
   font-weight: 500;
 }
 
+/* Emphasize message when focused for assistive tech */
 .confirmation-message:focus {
   outline: 3px solid #00aa00;
   outline-offset: 4px;
+}
+
+/* -------------------- Animations -------------------- */
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
