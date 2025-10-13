@@ -40,7 +40,7 @@
 			"response": []
 		},
 		{
-			"name": "New Request",
+			"name": "Delete Event",
 			"id": "48116443-6912b3ee-01a5-4f02-94d6-bd3b40525e17",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
