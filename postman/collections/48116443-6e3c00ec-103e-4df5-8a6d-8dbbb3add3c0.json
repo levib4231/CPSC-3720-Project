@@ -15,12 +15,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:6001/api/events",
-					"protocol": "http",
+					"raw": "{{ClientService}}/api/events",
 					"host": [
-						"localhost"
+						"{{ClientService}}"
 					],
-					"port": "6001",
 					"path": [
 						"api",
 						"events"
@@ -39,12 +37,10 @@
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:6001/api/events/:id/purchase",
-					"protocol": "http",
+					"raw": "{{ClientService}}/api/events/:id/purchase",
 					"host": [
-						"localhost"
+						"{{ClientService}}"
 					],
-					"port": "6001",
 					"path": [
 						"api",
 						"events",
