@@ -16,7 +16,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"name\": \"Homecoming Concert\",\n  \"date\": \"2025-10-20\",\n  \"tickets\": 150\n}",
+					"raw": "{\n    \"id\": 3,\n    \"name\": \"Soccer Game\",\n    \"date\": \"2025-10-12\",\n    \"tickets\": 1\n}",
 					"options": {
 						"raw": {
 							"language": "json"
