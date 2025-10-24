@@ -25,7 +25,7 @@
 import fetch from 'node-fetch';
 
 /** -------------------- Configuration -------------------- */
-const EVENT_ID = 1; // Event to test
+const EVENT_ID = 3; // Event to test
 const PURCHASES = [
   { quantity: 1 },
   { quantity: 1 },
