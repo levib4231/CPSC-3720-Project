@@ -1,0 +1,71 @@
+{
+	"info": {
+		"_postman_id": "49087940-6dae8c8e-cda6-408b-aa83-4aa2135f7d7b",
+		"name": "LLM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Parse Natural Language Booking",
+			"id": "49087940-9a0330f8-780e-4881-808e-728106113bf9",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\" : \"Book two tickets for Jazz Night\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{LLMService}}/llm/parse",
+					"host": [
+						"{{LLMService}}"
+					],
+					"path": [
+						"llm",
+						"parse"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm Booking",
+			"id": "49087940-157f52eb-6e19-41fb-a172-fd1c4d29fbd2",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"eventName\": \"Jazz Night\",\n  \"tickets\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{LLMService}}}/llm/confirm",
+					"host": [
+						"{{LLMService}}}"
+					],
+					"path": [
+						"llm",
+						"confirm"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
