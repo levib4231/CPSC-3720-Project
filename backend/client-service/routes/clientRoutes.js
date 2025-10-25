@@ -6,6 +6,7 @@
  *   These routes handle public (non-admin) operations such as:
  *   - Viewing available events
  *   - Purchasing event tickets
+ *   - Booking tickets using natural language (LLM integration)
  *
  * Standards Addressed:
  *   - File and route-level documentation
@@ -17,7 +18,11 @@
 
 const express = require("express");
 const router = express.Router();
-const { listEvents, purchaseEvent } = require("../controllers/clientController");
+const {
+  listEvents,
+  purchaseEvent,
+  llmBookEvent, // ← Added new controller method
+} = require("../controllers/clientController");
 
 /**
  * @route   GET /api/events
@@ -52,6 +57,32 @@ router.get("/events", listEvents);
  * POST /api/events/2/purchase
  */
 router.post("/events/:id/purchase", purchaseEvent);
+
+/**
+ * @route   POST /api/events/llm-book
+ * @desc    Handles natural-language ticket booking using the LLM microservice.
+ * @access  Public
+ *
+ * @body
+ *   {string} message  - User input like "Book two tickets for Jazz Night"
+ *   {boolean} [confirm] - Whether the user confirmed the suggested booking
+ *   {string} [eventName] - Event name to confirm booking
+ *   {number} [tickets] - Number of tickets to confirm booking
+ *
+ * @returns {Object} Dynamic response based on step:
+ *   - Step 1 (parse): { step: "confirmation_required", proposedBooking: {...} }
+ *   - Step 2 (confirm): { message: "Successfully booked 2 ticket(s) for Jazz Night" }
+ *
+ * @example
+ * // Step 1: Parse request
+ * POST /api/events/llm-book
+ * Body: { "message": "Book two tickets for Jazz Night" }
+ *
+ * // Step 2: Confirm booking
+ * POST /api/events/llm-book
+ * Body: { "confirm": true, "eventName": "Jazz Night", "tickets": 2 }
+ */
+router.post("/events/llm-book", llmBookEvent);
 
 // ------------------------------------------------------------
 // Export router

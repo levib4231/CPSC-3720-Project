@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { parseBookingRequest, confirmBooking } = require("../controllers/llmController");
+const llmController = require("../controllers/llmController");
 
-// Parse natural-language booking intent
-router.post("/parse", parseBookingRequest);
+// Route for parsing natural language booking requests
+router.post("/parse", llmController.parseBookingRequest);
 
-// Confirm booking (with explicit user confirmation)
-router.post("/confirm", confirmBooking);
+// Route for confirming bookings (after user confirmation)
+router.post("/confirm", llmController.confirmBooking);
 
 module.exports = router;
