@@ -5,23 +5,37 @@ const fetch = require("node-fetch");
  * POST /api/llm/parse
  * Parses user natural language input (e.g., "Book two tickets for Jazz Night").
  */
-exports.parseBookingRequest = async (req, res) => {
-  try {
-    const { text } = req.body;
-    if (!text) return res.status(400).json({ error: "Missing 'text' field" });
 
-    const parsed = await parseTextToBooking(text);
-    if (!parsed) {
-      return res.status(422).json({
-        error: "Could not parse request",
-        fallback: "Try 'Book 2 tickets for [Event Name]'",
+exports.parseBookingRequest = async (req, res) => {
+  console.log("[LLM Controller] req.body:", req.body);
+
+  // Safely get the user message
+  const message = req.body?.message;
+  if (!message) {
+    return res.status(400).json({
+      reply: "No message provided. Make sure you send JSON with { message: '...' }",
+    });
+  }
+
+  try {
+    // Attempt to parse booking info via LLM + regex fallback
+    const bookingInfo = await parseTextToBooking(message);
+
+    if (!bookingInfo) {
+      // If nothing could be parsed, send fallback reply
+      return res.status(200).json({
+        reply: "Sorry, I couldn't understand your booking request.",
       });
     }
 
-    return res.json({ parsed, source: "llm" });
+    // Compose a friendly response
+    const reply = `Got it! You want to book ${bookingInfo.tickets} ticket(s) for "${bookingInfo.event}".`;
+
+    // Return both the raw booking data and a chat-friendly reply
+    res.status(200).json({ reply, bookingInfo });
   } catch (err) {
-    console.error("[LLM Controller] Error parsing text:", err.message);
-    res.status(500).json({ error: "Internal LLM parse error" });
+    console.error("[LLM Controller] LLM error:", err);
+    res.status(500).json({ reply: "Oops! Something went wrong." });
   }
 };
 

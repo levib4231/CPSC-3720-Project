@@ -23,6 +23,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import './App.css';
+import ChatWindow from './ChatWindow'; // Import chat component
 
 function App() {
   const [events, setEvents] = useState([]);
@@ -81,10 +82,8 @@ function App() {
     setStatusMessage(message);
     setStatusVisible(true);
 
-    // Fade out after 4 seconds
     setTimeout(() => {
       setStatusVisible(false);
-      // Remove message from DOM after fade transition (0.5s)
       setTimeout(() => setStatusMessage(''), 500);
     }, 4000);
   };
@@ -133,6 +132,12 @@ function App() {
               {statusMessage}
             </div>
           )}
+
+          {/* -------------------- Chat Window -------------------- */}
+          <div className="mt-8">
+            <h2>Chat with our Assistant</h2>
+            <ChatWindow />
+          </div>
         </main>
       </div>
     </>
