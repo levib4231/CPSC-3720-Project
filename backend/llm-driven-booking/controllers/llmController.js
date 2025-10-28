@@ -1,69 +1,82 @@
+const axios = require("axios");
 const { parseTextToBooking } = require("../services/llmParser");
-const fetch = require("node-fetch");
 
 /**
  * POST /api/llm/parse
- * Parses user natural language input (e.g., "Book two tickets for Jazz Night").
+ * Parse user input into booking info using LLM + fallback.
  */
-
 exports.parseBookingRequest = async (req, res) => {
   console.log("[LLM Controller] req.body:", req.body);
 
-  // Safely get the user message
-  const message = req.body?.message;
+  const message = req.body?.message?.trim();
   if (!message) {
     return res.status(400).json({
-      reply: "No message provided. Make sure you send JSON with { message: '...' }",
+      reply:
+        "No message provided. Please send JSON like { message: 'Book 2 tickets for Jazz Night' }",
     });
   }
 
   try {
-    // Attempt to parse booking info via LLM + regex fallback
     const bookingInfo = await parseTextToBooking(message);
 
     if (!bookingInfo) {
-      // If nothing could be parsed, send fallback reply
       return res.status(200).json({
         reply: "Sorry, I couldn't understand your booking request.",
+        bookingInfo: null,
       });
     }
 
-    // Compose a friendly response
-    const reply = `Got it! You want to book ${bookingInfo.tickets} ticket(s) for "${bookingInfo.event}".`;
+    const reply = `Got it! You want to book ${bookingInfo.tickets} ticket(s) for "${bookingInfo.event}". Please confirm to proceed.`;
 
-    // Return both the raw booking data and a chat-friendly reply
     res.status(200).json({ reply, bookingInfo });
   } catch (err) {
     console.error("[LLM Controller] LLM error:", err);
-    res.status(500).json({ reply: "Oops! Something went wrong." });
+    res
+      .status(500)
+      .json({ reply: "Oops! Something went wrong parsing your request." });
   }
 };
 
 /**
  * POST /api/llm/confirm
- * After confirmation, calls the client service to actually book tickets.
+ * Confirms a booking after explicit user approval.
+ * Delegates to the event service on port 6001.
  */
 exports.confirmBooking = async (req, res) => {
   try {
     const { eventName, tickets } = req.body;
     if (!eventName || !tickets) {
-      return res.status(400).json({ error: "Missing eventName or tickets" });
+      return res.status(400).json({ error: "Missing eventName or tickets." });
     }
 
-    // Fetch all events from client-service
-    const eventsRes = await fetch("http://localhost:6001/api/events");
-    const events = await eventsRes.json();
+    // Fetch all events from the event service
+    const { data: events } = await axios.get("http://localhost:6001/api/events");
+
     const match = events.find(
       (e) => e.name.toLowerCase() === eventName.toLowerCase()
     );
 
-    if (!match) return res.status(404).json({ error: "Event not found" });
+    if (!match)
+      return res
+        .status(404)
+        .json({ error: `Event not found: ${eventName}` });
 
-    // Trigger booking for each ticket (or modify for bulk booking)
+    // Check if enough tickets are available
+    if (match.tickets < tickets) {
+      return res.status(409).json({ error: "Not enough tickets available." });
+    }
+
+    // Perform booking (bulk)
     for (let i = 0; i < tickets; i++) {
-      await fetch(`http://localhost:6001/api/events/${match.id}/purchase`, {
-        method: "POST",
-      });
+      const purchaseRes = await axios.post(
+        `http://localhost:6001/api/events/${match.id}/purchase`
+      );
+
+      if (purchaseRes.status !== 200) {
+        throw new Error(
+          `Purchase failed with status ${purchaseRes.status}: ${purchaseRes.statusText}`
+        );
+      }
     }
 
     res.json({
@@ -75,6 +88,6 @@ exports.confirmBooking = async (req, res) => {
     });
   } catch (err) {
     console.error("[LLM Controller] Booking confirm error:", err.message);
-    res.status(500).json({ error: "Failed to confirm booking" });
+    res.status(500).json({ error: "Failed to confirm booking." });
   }
 };

@@ -4,17 +4,18 @@ export default function ChatWindow() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingBooking, setPendingBooking] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Scroll to bottom whenever messages update
+  // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Send a user message to the LLM parse API
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    // Add user message
     setMessages((prev) => [...prev, { text: input, sender: "user" }]);
     const userMessage = input;
     setInput("");
@@ -30,17 +31,69 @@ export default function ChatWindow() {
       if (!res.ok) throw new Error(`Server responded ${res.status}`);
       const data = await res.json();
 
+      // Add LLM reply
       setMessages((prev) => [
         ...prev,
         { text: data.reply || "No response", sender: "bot" },
       ]);
+
+      // Store booking info if the message contained a booking intent
+      if (data.bookingInfo && data.bookingInfo.event && data.bookingInfo.tickets) {
+        setPendingBooking(data.bookingInfo);
+      } else {
+        setPendingBooking(null);
+      }
     } catch (err) {
       console.error("LLM request failed:", err);
       setMessages((prev) => [
         ...prev,
         { text: "Oops! Something went wrong.", sender: "bot" },
       ]);
+      setPendingBooking(null);
     } finally {
+      setLoading(false);
+    }
+  };
+
+  // Confirm the booking
+  const handleConfirmBooking = async () => {
+    if (!pendingBooking) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch("http://localhost:6002/api/llm/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventName: pendingBooking.event,
+          tickets: pendingBooking.tickets,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessages((prev) => [
+          ...prev,
+          { text: data.message || "Booking confirmed!", sender: "bot" },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: data.error || "Booking failed. Please try again.",
+            sender: "bot",
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error("Confirm booking failed:", err);
+      setMessages((prev) => [
+        ...prev,
+        { text: "Error confirming booking.", sender: "bot" },
+      ]);
+    } finally {
+      setPendingBooking(null);
       setLoading(false);
     }
   };
@@ -65,6 +118,34 @@ export default function ChatWindow() {
             {msg.text}
           </div>
         ))}
+
+        {/* Show confirmation UI if a booking is pending */}
+        {pendingBooking && (
+          <div className="my-4 p-3 bg-yellow-100 border border-yellow-400 rounded-lg text-sm text-gray-800">
+            <p>
+              Confirm booking of{" "}
+              <strong>{pendingBooking.tickets}</strong> ticket(s) for{" "}
+              <strong>{pendingBooking.event}</strong>?
+            </p>
+            <div className="mt-2 flex space-x-2">
+              <button
+                onClick={handleConfirmBooking}
+                disabled={loading}
+                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setPendingBooking(null)}
+                disabled={loading}
+                className="bg-red-400 hover:bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -82,7 +163,9 @@ export default function ChatWindow() {
         <button
           onClick={handleSend}
           className={`px-4 py-2 rounded-r-lg text-white ${
-            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600"
           }`}
           disabled={loading}
         >
