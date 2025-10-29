@@ -55,7 +55,7 @@ Respond strictly in JSON format with no extra text or explanation:
 {"event": "<event name>", "tickets": <number>, "intent": "book"}`;
 
     const response = await axios.post("http://localhost:1234/v1/chat/completions", {
-      model: "gpt-oss-20b",
+      model: "qwen2.5-7b-instruct",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.2,
     });
