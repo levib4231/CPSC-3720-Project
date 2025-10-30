@@ -3,10 +3,10 @@
  * @description Extracts structured booking info from natural language input.
  */
 
-const OpenAI = require("openai");
+/*const OpenAI = require("openai");
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // or leave undefined if using Ollama
-});
+});*/
 
 /**
  * Extracts event name, ticket quantity, and intent.
