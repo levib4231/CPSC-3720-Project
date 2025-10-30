@@ -1,0 +1,31 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "test:single": "react-scripts test --runInBand --watchAll=false"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^11.2.7"
+  }
+} 
+
+// hello.test.jsx
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import HelloWorld from '../HelloWorld'; // Assuming HelloWorld is the component to test
+
+test('renders Hello World component', () => {
+  render(<HelloWorld />);
+  const linkElement = screen.getByText(/Hello World/i);
+  expect(linkElement).toBeInTheDocument();
+});

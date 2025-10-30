@@ -19,12 +19,14 @@ function App() {
   /** -------------------- Fetch Events -------------------- */
   const fetchEvents = async () => {
     try {
-      const res = await fetch("http://localhost:6001/api/events");
-      if (!res.ok) throw new Error(`Server responded ${res.status}`);
+      const res = await fetch("/api/events");
+      if (!res.ok) throw new Error("Failed to fetch events");
       const data = await res.json();
       setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Failed to load events:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Failed to load events:", err);
+      }
       showStatus("Failed to load events. Please try again later.");
     }
   };

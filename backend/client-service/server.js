@@ -18,38 +18,39 @@
 const express = require("express");
 const cors = require("cors");
 const clientRoutes = require("./routes/clientRoutes");
+const { close: closeClientDb } = require("./db"); // add or adapt to your db helper
 
 const app = express();
 const PORT = process.env.PORT || 6001;
 
-// ------------------------------------------------------------
-// Middleware
-// ------------------------------------------------------------
-
-// Enables CORS for cross-origin requests (e.g., frontend → backend)
 app.use(cors());
-
-// Parses incoming JSON request bodies
 app.use(express.json());
-
-// ------------------------------------------------------------
-// Routes
-// ------------------------------------------------------------
-
-// Mount all client-facing routes (events, purchases)
 app.use("/api", clientRoutes);
 
-// ------------------------------------------------------------
-// Global Error Handler
-// ------------------------------------------------------------
+// global error handler
 app.use((err, req, res, next) => {
   console.error("[ClientService Error]", err.stack);
   res.status(500).json({ error: "Internal server error" });
 });
 
-// ------------------------------------------------------------
-// Server Startup
-// ------------------------------------------------------------
-app.listen(PORT, () => {
-  console.log(`Client Service running on port ${PORT}`);
-});
+// only listen when run directly
+let serverInstance = null;
+if (require.main === module) {
+  serverInstance = app.listen(PORT, () => {
+    console.log(`Client Service running on port ${PORT}`);
+  });
+}
+
+// shutdown helper for tests
+app.shutdown = async function () {
+  if (serverInstance && typeof serverInstance.close === "function") {
+    await new Promise((res) => serverInstance.close(res));
+  }
+  if (typeof closeClientDb === "function") {
+    try {
+      await closeClientDb();
+    } catch (e) { /* ignore */ }
+  }
+};
+
+module.exports = app;

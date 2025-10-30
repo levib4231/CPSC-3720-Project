@@ -24,7 +24,7 @@
  */
 
 const axios = require("axios");
-const { getAllEvents, purchaseTicket } = require("../models/clientModel");
+const { purchaseTicket, getAllEvents } = require("../models/clientModel");
 
 /**
  * @function listEvents
@@ -53,37 +53,25 @@ exports.listEvents = async (req, res) => {
  * @returns {JSON} 200 OK on success, or an appropriate error status on failure.
  */
 exports.purchaseEvent = async (req, res) => {
+  const eventId = parseInt(req.params.id, 10);
+  const quantity = parseInt(req.body.quantity || 1, 10);
+
+  if (Number.isNaN(eventId) || Number.isNaN(quantity) || quantity <= 0) {
+    return res.status(400).json({ success: false, error: "Invalid event id or quantity" });
+  }
+
   try {
-    const eventId = parseInt(req.params.id, 10);
-
-    // --- Input Validation ---
-    if (isNaN(eventId) || eventId <= 0) {
-      return res.status(400).json({ error: "Invalid event ID provided." });
+    const result = await purchaseTicket(eventId, quantity);
+    // Expect result to be an object like { success: true, remainingTickets: X } or { success: false, error: "..." }
+    if (result && typeof result === "object") {
+      // forward the model result as JSON
+      return res.status(result.success ? 200 : 400).json(result);
     }
-
-    // --- Process Purchase ---
-    const result = await purchaseTicket(eventId);
-
-    return res.status(200).json({
-      message: "Ticket purchased successfully.",
-      event: result.eventName,
-      remainingTickets: result.remainingTickets,
-    });
+    // fallback
+    return res.status(500).json({ success: false, error: "Unknown purchase result" });
   } catch (err) {
-    console.error("[ClientController] Error purchasing ticket:", err);
-
-    // --- Specific Error Handling ---
-    switch (err.message) {
-      case "EVENT_NOT_FOUND":
-        return res.status(404).json({ error: "Event not found." });
-      case "SOLD_OUT":
-      case "SOLD_OUT_RACE":
-        return res.status(409).json({ error: "Tickets sold out." });
-      default:
-        return res.status(500).json({
-          error: "An internal server error occurred while purchasing a ticket.",
-        });
-    }
+    console.error("[ClientController] purchase error:", err);
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
 

@@ -13,7 +13,7 @@
  * ---------------------------------------------------------
  */
 
-const { addEvent } = require("../models/adminModel");
+const adminModel = require("../models/adminModel");
 
 /**
  * @function createEvent
@@ -31,39 +31,27 @@ const { addEvent } = require("../models/adminModel");
  * @sideEffects Writes a new record to the `events` table.
  */
 exports.createEvent = async (req, res) => {
+  const { name, date, tickets } = req.body;
+  if (!name || !date || typeof tickets === "undefined") {
+    return res.status(400).json({ error: "Missing name, date, or tickets" });
+  }
+
   try {
-    const { name, date, tickets } = req.body;
-
-    // --- Input Validation ---
-    if (!name || !date || tickets === undefined) {
-      return res.status(400).json({
-        error: "Missing required event data: name, date, and tickets are mandatory.",
-      });
-    }
-
-    // Validate ticket count and date format (basic check)
-    if (typeof tickets !== "number" || tickets < 0) {
-      return res.status(400).json({ error: "Tickets must be a non-negative number." });
-    }
-
-    const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!isoDateRegex.test(date)) {
-      return res.status(400).json({
-        error: "Date must be in ISO 8601 format (YYYY-MM-DD).",
-      });
-    }
-
-    // --- Database Operation ---
-    await addEvent(name, date, tickets);
-
-    return res.status(201).json({
-      message: `Event '${name}' created successfully.`,
-    });
+    // adminModel.addEvent(name, date, tickets) -> returns created event or id
+    const created = await adminModel.addEvent(name, date, tickets);
+    return res.status(created && created.id ? 201 : 200).json(created);
   } catch (err) {
-    console.error("Error in createEvent:", err);
+    console.error("[AdminController] createEvent error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
 
-    return res.status(500).json({
-      error: "An internal server error occurred while creating the event.",
-    });
+exports.listEvents = async (req, res) => {
+  try {
+    const events = await adminModel.getAllEvents();
+    return res.status(200).json(events || []);
+  } catch (err) {
+    console.error("[AdminController] listEvents error:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };

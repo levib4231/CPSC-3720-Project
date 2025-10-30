@@ -1,0 +1,28 @@
+{
+  "scripts": {
+    "test:single": "react-scripts test --runInBand --watchAll=false"
+  }
+}
+
+const mockAudioContext = {
+  createGain: jest.fn().mockReturnValue({}),
+  createOscillator: jest.fn().mockReturnValue({
+    start: jest.fn(),
+    stop: jest.fn(),
+  }),
+  currentTime: 0,
+  resume: jest.fn(),
+};
+
+global.AudioContext = jest.fn().mockImplementation(() => mockAudioContext);
+
+const mockSpeechRecognition = {
+  start: jest.fn(),
+  stop: jest.fn(),
+  onstart: null,
+  onend: null,
+  onresult: null,
+  onerror: null,
+};
+
+global.SpeechRecognition = jest.fn().mockImplementation(() => mockSpeechRecognition);

@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [admin-service, client-service, llm-driven-booking]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install & test ${{ matrix.service }}
+        working-directory: backend/${{ matrix.service }}
+        run: |
+          npm ci
+          npm test -- --detectOpenHandles
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install & test frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm test -- --watchAll=false

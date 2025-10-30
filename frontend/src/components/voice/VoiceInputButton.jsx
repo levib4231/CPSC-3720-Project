@@ -108,7 +108,9 @@ export default function VoiceInputButton({
       recognition.onstart = () => {
         setIsListening(true);
         setIsProcessing(false);
-        console.log("Voice recognition started");
+        if (process.env.NODE_ENV === "development") {
+          console.log("Voice recognition started");
+        }
       };
 
       recognition.onresult = (event) => {
@@ -118,7 +120,9 @@ export default function VoiceInputButton({
         if (lastResult.isFinal) {
           // Final transcript
           const transcript = lastResult[0].transcript;
-          console.log("Final transcript:", transcript);
+          if (process.env.NODE_ENV === "development") {
+            console.log("Final transcript:", transcript);
+          }
           if (onTranscript && transcript.trim()) {
             onTranscript(transcript);
           }
@@ -131,13 +135,17 @@ export default function VoiceInputButton({
       };
 
       recognition.onspeechend = () => {
-        console.log("Speech ended");
+        if (process.env.NODE_ENV === "development") {
+          console.log("Speech ended");
+        }
         setIsListening(false);
         setIsProcessing(true);
       };
 
       recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Speech recognition error:", event.error);
+        }
 
         let errorMessage = "Voice input failed. Please try again.";
         switch (event.error) {
@@ -163,7 +171,9 @@ export default function VoiceInputButton({
       };
 
       recognition.onend = () => {
-        console.log("Voice recognition ended");
+        if (process.env.NODE_ENV === "development") {
+          console.log("Voice recognition ended");
+        }
         setIsListening(false);
         setIsProcessing(false);
         recognitionRef.current = null;

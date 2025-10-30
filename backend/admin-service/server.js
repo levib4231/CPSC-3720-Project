@@ -18,6 +18,7 @@
 const express = require("express");
 const cors = require("cors");
 const adminRoutes = require("./routes/adminRoutes");
+const { close: closeAdminDb } = require("./db"); // new
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -44,6 +45,25 @@ app.use((err, req, res, next) => {
 // ------------------------------------------------------------
 // Server Initialization
 // ------------------------------------------------------------
-app.listen(PORT, () => {
-  console.log(`Admin Service running on port ${PORT}`);
-});
+let serverInstance = null;
+if (require.main === module) {
+  serverInstance = app.listen(PORT, () => {
+    console.log(`Admin Service running on port ${PORT}`);
+  });
+}
+
+// Export app and a shutdown function for tests
+app.shutdown = async function () {
+  // close HTTP server if started
+  if (serverInstance && typeof serverInstance.close === "function") {
+    await new Promise((res) => serverInstance.close(res));
+  }
+  // close DB
+  try {
+    await closeAdminDb();
+  } catch (e) {
+    // ignore close errors in tests
+  }
+};
+
+module.exports = app;
