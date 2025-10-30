@@ -6,21 +6,28 @@
 function run_in_new_tab() {
   local dir="$1"
   local cmd="$2"
-  osascript \
-    -e "tell application \"Terminal\" to do script \"cd $dir; $cmd; exec zsh\""
+  # Properly quote the directory for AppleScript
+  osascript <<EOF
+tell application "Terminal"
+  do script "cd \"${dir}\" && ${cmd}; exec zsh"
+end tell
+EOF
 }
 
+# Determine absolute project root
+PROJECT_ROOT="$(pwd)"
+
 # Start backend admin-service
-run_in_new_tab "$(pwd)/backend/admin-service" "npm install && node server.js"
+run_in_new_tab "${PROJECT_ROOT}/backend/admin-service" "npm install && node server.js"
 
 # Start backend client-service
-run_in_new_tab "$(pwd)/backend/client-service" "npm install && node server.js"
+run_in_new_tab "${PROJECT_ROOT}/backend/client-service" "npm install && node server.js"
 
 # Start backend llm-driven-booking
-run_in_new_tab "$(pwd)/backend/llm-driven-booking" "npm install && node server.js"
+run_in_new_tab "${PROJECT_ROOT}/backend/llm-driven-booking" "npm install && node server.js"
 
 # Start frontend
-run_in_new_tab "$(pwd)/frontend" "npm install && npm start; echo ''; echo 'Frontend should be running at http://localhost:3000'; read -n 1 -s -r -p 'Press any key to close this tab...'"
+run_in_new_tab "${PROJECT_ROOT}/frontend" "npm install && npm start; echo ''; echo 'Frontend running at http://localhost:3000'; read -n 1 -s -r -p 'Press any key to close this tab...'"
 
 # Print summary
 sleep 2
