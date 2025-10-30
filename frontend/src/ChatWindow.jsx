@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from "react";
+import VoiceInputButton from "./components/voice/VoiceInputButton";
 
 export default function ChatWindow() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingBooking, setPendingBooking] = useState(null);
+  const [interimTranscript, setInterimTranscript] = useState("");
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to bottom on new messages
@@ -101,6 +103,17 @@ export default function ChatWindow() {
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleSend();
   };
+ 
+  // Handle voice input transcript (final result)
+  const handleVoiceTranscript = (transcript) => {
+    setInput(transcript);
+    setInterimTranscript(""); // Clear interim text
+  };
+
+  // Handle voice input interim results (optional preview)
+  const handleVoiceInterim = (transcript) => {
+    setInterimTranscript(transcript);
+  };
 
   return (
     <div className="flex flex-col h-[500px] w-full max-w-md border rounded-lg shadow-lg overflow-hidden">
@@ -149,16 +162,29 @@ export default function ChatWindow() {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Interim voice transcript preview */}
+        {interimTranscript && (
+          <div className="my-2 p-2 rounded-lg max-w-[80%] bg-blue-300 text-gray-700 ml-auto italic opacity-70">
+            {interimTranscript}
+          </div>
+        )}
+
       {/* Input area */}
       <div className="flex p-2 border-t bg-white">
         <input
           type="text"
           className="flex-1 border rounded-l-lg px-3 py-2 focus:outline-none"
-          placeholder="Type a message..."
+          placeholder="Type or speak a message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyPress}
           disabled={loading}
+        />
+        <VoiceInputButton
+          onTranscript={handleVoiceTranscript}
+          onInterim={handleVoiceInterim}
+          disabled={loading}
+          ariaLabel="Start voice input"
         />
         <button
           onClick={handleSend}
