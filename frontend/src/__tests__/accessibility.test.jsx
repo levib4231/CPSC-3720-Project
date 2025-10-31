@@ -1,13 +1,41 @@
+/**
+ * Test Suite: ChatWindow and VoiceInputButton
+ * ---------------------------------------------------------
+ * Purpose:
+ *   Contains unit tests for the ChatWindow and VoiceInputButton components.
+ *   Tests include:
+ *     - ChatWindow booking workflow and confirmation behavior
+ *     - VoiceInputButton accessibility (keyboard focus and ARIA naming)
+ *
+ * Dependencies:
+ *   - @testing-library/react
+ *   - ChatWindow component
+ *   - VoiceInputButton component
+ * ---------------------------------------------------------
+ */
+
 import React from "react";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import ChatWindow from "../ChatWindow";
 import VoiceInputButton from "../components/voice/VoiceInputButton";
 
+/**
+ * @function testChatWindowNoBookingBeforeConfirmation
+ * @description Ensures ChatWindow does not trigger ticket booking
+ *   before the user explicitly confirms the action.
+ *
+ * @returns {void}
+ *
+ * @sideEffects Mocks global fetch and simulates user interactions.
+ */
 test("No booking occurs before explicit confirmation (ChatWindow)", async () => {
-  const calls = [];
-  global.fetch = jest.fn((url, opts) => {
-    calls.push(url);
-    if (url && url.endsWith("/api/llm/parse")) {
+  const fetchCalls = [];
+
+  // Mock fetch API for parse, confirm, and event endpoints
+  global.fetch = jest.fn((url) => {
+    fetchCalls.push(url);
+
+    if (url.endsWith("/api/llm/parse")) {
       return Promise.resolve({
         ok: true,
         json: () =>
@@ -17,70 +45,101 @@ test("No booking occurs before explicit confirmation (ChatWindow)", async () => 
           }),
       });
     }
-    if (url && url.endsWith("/api/llm/confirm")) {
+
+    if (url.endsWith("/api/llm/confirm")) {
       return Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ success: true }),
       });
     }
-    if (url && url.includes("/api/events/")) {
-      return Promise.resolve({ ok: true, json: () => Promise.resolve({ message: "purchased" }) });
+
+    if (url.includes("/api/events/")) {
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ message: "purchased" }),
+      });
     }
+
     return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
   });
 
   render(<ChatWindow />);
 
-  const input = screen.getByPlaceholderText(/Type or speak a message/i);
+  const messageInput = screen.getByPlaceholderText(/Type or speak a message/i);
+  
   await act(async () => {
-    fireEvent.change(input, { target: { value: "Book two tickets for Football Game" } });
-    const send = screen.getByRole("button", { name: /send/i });
-    fireEvent.click(send);
+    fireEvent.change(messageInput, { target: { value: "Book two tickets for Football Game" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
   });
 
-  // wait for LLM reply to appear
+  // Wait for the LLM's reply to appear in the UI
   await screen.findByText(/I can book that for you./i);
 
-  // Ensure parse endpoint was called
-  expect(calls.some((u) => u.endsWith("/api/llm/parse"))).toBe(true);
-  // Ensure there was no direct client purchase call before confirmation
-  expect(calls.some((u) => u.includes("/api/events/"))).toBe(false);
+  // Assert parse endpoint was called
+  expect(fetchCalls.some((url) => url.endsWith("/api/llm/parse"))).toBe(true);
+  // Assert no purchase call was made before confirmation
+  expect(fetchCalls.some((url) => url.includes("/api/events/"))).toBe(false);
 
-  // Now click confirm and ensure confirm endpoint is called
-  // wait for confirmation UI
+  // Wait for confirmation prompt to render
   await waitFor(() => {
     expect(screen.getByText(/Confirm booking of/)).toBeInTheDocument();
   });
 
   const confirmButton = screen.getByRole("button", { name: /confirm/i });
 
-  // click inside act, then wait for the confirm network call
+  // Simulate user confirming the booking
   await act(async () => {
     fireEvent.click(confirmButton);
   });
 
-  await waitFor(() => expect(calls.some((u) => u.endsWith("/api/llm/confirm"))).toBe(true));
+  // Assert confirm endpoint was called
+  await waitFor(() =>
+    expect(fetchCalls.some((url) => url.endsWith("/api/llm/confirm"))).toBe(true)
+  );
 
-  // cleanup
+  // Restore original fetch
   global.fetch.mockRestore && global.fetch.mockRestore();
   global.fetch = undefined;
 });
 
+/**
+ * @function testVoiceInputButtonAccessibility
+ * @description Ensures VoiceInputButton can receive keyboard focus
+ *   and has a valid accessible name for screen readers.
+ *
+ * @returns {void}
+ */
 test("VoiceInputButton is keyboard-focusable and has an accessible name", async () => {
-  const onTranscript = jest.fn();
-  render(<VoiceInputButton onTranscript={onTranscript} />);
-  const button = screen.getByRole("button");
-  expect(button).toBeTruthy();
+  const onTranscriptMock = jest.fn();
+
+  render(<VoiceInputButton onTranscript={onTranscriptMock} />);
+  const buttonElement = screen.getByRole("button");
+
+  // Assert button exists
+  expect(buttonElement).toBeTruthy();
+
+  // Simulate keyboard focus
   await act(async () => {
-    button.focus();
+    buttonElement.focus();
   });
-  await waitFor(() => expect(document.activeElement).toBe(button));
+
+  // Verify focus landed on button
+  await waitFor(() => expect(document.activeElement).toBe(buttonElement));
 });
 
+/**
+ * @function testChatWindowNoConfirmPromptWhenNoBookingInfo
+ * @description Ensures ChatWindow does not show confirmation prompt
+ *   when LLM returns no bookingInfo (fallback scenario).
+ *
+ * @returns {void}
+ *
+ * @sideEffects Mocks global fetch and simulates user interactions.
+ */
 test("When LLM returns no bookingInfo, ChatWindow does not show Confirm prompt (fallback)", async () => {
   // Mock fetch: parse returns reply but no bookingInfo
-  global.fetch = jest.fn((url, opts) => {
-    if (url && url.endsWith("/api/llm/parse")) {
+  global.fetch = jest.fn((url) => {
+    if (url.endsWith("/api/llm/parse")) {
       return Promise.resolve({
         ok: true,
         json: () =>
@@ -95,20 +154,22 @@ test("When LLM returns no bookingInfo, ChatWindow does not show Confirm prompt (
 
   render(<ChatWindow />);
 
-  const input = screen.getByPlaceholderText(/Type or speak a message/i);
-  fireEvent.change(input, { target: { value: "Book some tickets" } });
+  const inputField = screen.getByPlaceholderText(/Type or speak a message/i);
+  fireEvent.change(inputField, { target: { value: "Book some tickets" } });
+  fireEvent.click(screen.getByRole("button", { name: /send/i }));
 
-  const send = screen.getByRole("button", { name: /send/i });
-  fireEvent.click(send);
-
+  // Wait for LLM fallback reply
   await waitFor(() => {
-    expect(screen.getByText(/Sorry, I couldn't determine which event you mean./i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Sorry, I couldn't determine which event you mean./i)
+    ).toBeInTheDocument();
   });
 
-  // Confirm prompt should NOT be present when bookingInfo is null/unparsable
+  // Confirm prompt should NOT be present when bookingInfo is null
   const confirmPrompt = screen.queryByText(/Confirm booking/i) || screen.queryByText(/Confirm/i);
   expect(confirmPrompt).toBeNull();
 
+  // Restore original fetch
   global.fetch.mockRestore && global.fetch.mockRestore();
   global.fetch = undefined;
 });
