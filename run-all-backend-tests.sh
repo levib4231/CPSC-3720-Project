@@ -54,16 +54,12 @@ run_section "Admin Service" "${PROJECT_ROOT}/backend/admin-service" "npm test"
 run_section "Client Service" "${PROJECT_ROOT}/backend/client-service" "npm test"
 run_section "LLM-Driven Booking" "${PROJECT_ROOT}/backend/llm-driven-booking" "npm test"
 
-# ----------------------------
-# Frontend
-# ----------------------------
-run_section "Frontend (React)" "${PROJECT_ROOT}/frontend" "npm test"
 
 # ----------------------------
 # Optional Concurrency Test
 # ----------------------------
 if [ -f "${PROJECT_ROOT}/backend/client-service/__tests__/concurrency.test.js" ]; then
-  echo "⚙️  Running concurrency test (client-service)..." | tee -a "$REPORT_FILE"
+  echo " Running concurrency test (client-service)..." | tee -a "$REPORT_FILE"
   cd "${PROJECT_ROOT}/backend/client-service"
   npm test __tests__/concurrency.test.js --runInBand --detectOpenHandles 2>&1 | tee -a "$REPORT_FILE"
   cd "$PROJECT_ROOT"
