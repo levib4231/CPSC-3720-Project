@@ -19,7 +19,7 @@ function App() {
   /** -------------------- Fetch Events -------------------- */
   const fetchEvents = async () => {
     try {
-      const res = await fetch("/api/events");
+      const res = await fetch("http://localhost:6001/api/events");
       if (!res.ok) throw new Error("Failed to fetch events");
       const data = await res.json();
       setEvents(Array.isArray(data) ? data : []);
