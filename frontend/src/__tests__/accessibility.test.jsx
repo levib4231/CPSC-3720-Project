@@ -33,7 +33,7 @@ test("No booking occurs before explicit confirmation (ChatWindow)", async () => 
 
   const input = screen.getByPlaceholderText(/Type or speak a message/i);
   await act(async () => {
-    fireEvent.change(input, { target: { value: "Book two tickets for Jazz Night" } });
+    fireEvent.change(input, { target: { value: "Book two tickets for Football Game" } });
     const send = screen.getByRole("button", { name: /send/i });
     fireEvent.click(send);
   });
