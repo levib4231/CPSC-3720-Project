@@ -13,7 +13,7 @@ test("No booking occurs before explicit confirmation (ChatWindow)", async () => 
         json: () =>
           Promise.resolve({
             reply: "I can book that for you.",
-            bookingInfo: { event: "Jazz Night", tickets: 2 },
+            bookingInfo: { event: "Football Game", tickets: 2 },
           }),
       });
     }
