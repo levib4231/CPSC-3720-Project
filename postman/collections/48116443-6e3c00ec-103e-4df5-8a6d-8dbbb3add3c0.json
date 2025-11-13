@@ -68,7 +68,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": 3,\n    \"email\": \"Soccer Game\",\n    \"password\": \"2025-10-12\"\n}",
+					"raw": "{\n    \"id\": 1,\n    \"email\": \"yourname@email.com\",\n    \"password\": \"mydogsname\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
