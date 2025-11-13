@@ -96,7 +96,27 @@
 			},
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"yourname@email.com\",\n    \"password\": \"mydogsname\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{ClientService}}/api/login/",
+					"host": [
+						"{{ClientService}}"
+					],
+					"path": [
+						"api",
+						"login",
+						""
+					]
+				}
 			},
 			"response": []
 		}
