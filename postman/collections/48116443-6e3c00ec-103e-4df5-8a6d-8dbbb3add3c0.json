@@ -64,24 +64,29 @@
 				"disableBodyPruning": true
 			},
 			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": [
-				{
-					"id": "48116443-cabbc6f2-38e1-4d9a-a1f7-d928ac26359a",
-					"name": "Register User",
-					"originalRequest": {
-						"method": "GET",
-						"header": []
-					},
-					"_postman_previewlanguage": null,
-					"header": null,
-					"cookie": [],
-					"responseTime": null,
-					"body": null
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 3,\n    \"email\": \"Soccer Game\",\n    \"password\": \"2025-10-12\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{ClientService}}/api/register",
+					"host": [
+						"{{ClientService}}"
+					],
+					"path": [
+						"api",
+						"register"
+					]
 				}
-			]
+			},
+			"response": []
 		},
 		{
 			"name": "New Request",
