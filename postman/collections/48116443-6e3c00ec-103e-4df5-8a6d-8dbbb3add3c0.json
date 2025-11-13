@@ -56,69 +56,6 @@
 				}
 			},
 			"response": []
-		},
-		{
-			"name": "Register User",
-			"id": "48116443-74df4f05-b358-4546-897a-151f4679abda",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": 1,\n    \"email\": \"yourname@email.com\",\n    \"password\": \"mydogsname\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{ClientService}}/api/register",
-					"host": [
-						"{{ClientService}}"
-					],
-					"path": [
-						"api",
-						"register"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Login User",
-			"id": "48116443-01cc37a8-c9eb-4872-83fe-9eb754f21386",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\": \"yourname@email.com\",\n    \"password\": \"mydogsname\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{ClientService}}/api/login/",
-					"host": [
-						"{{ClientService}}"
-					],
-					"path": [
-						"api",
-						"login",
-						""
-					]
-				}
-			},
-			"response": []
 		}
 	]
 }
