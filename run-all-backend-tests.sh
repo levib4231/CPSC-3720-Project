@@ -50,10 +50,10 @@ function run_section() {
 # ----------------------------
 # Backend microservices
 # ----------------------------
-run_section "Admin Service" "${PROJECT_ROOT}/backend/admin-service" "npm test"
-run_section "Client Service" "${PROJECT_ROOT}/backend/client-service" "npm test"
-run_section "LLM-Driven Booking" "${PROJECT_ROOT}/backend/llm-driven-booking" "npm test"
-
+run_section "Admin Service"            "${PROJECT_ROOT}/backend/admin-service"            "npm test"
+run_section "Client Service"           "${PROJECT_ROOT}/backend/client-service"           "npm test"
+run_section "LLM-Driven Booking"       "${PROJECT_ROOT}/backend/llm-driven-booking"       "npm test"
+run_section "User Authentication"      "${PROJECT_ROOT}/backend/user-authentication"      "npm test"   # <-- added
 
 # ----------------------------
 # Optional Concurrency Test

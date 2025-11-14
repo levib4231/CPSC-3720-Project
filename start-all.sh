@@ -31,11 +31,28 @@ EOF
 PROJECT_ROOT="$(pwd)"
 
 # ----------------------------
+# MongoDB (via Homebrew)
+# ----------------------------
+if command -v brew >/dev/null 2>&1; then
+  echo "Ensuring MongoDB is running..."
+  # Try common service names; ignore errors and just warn if both fail
+  if ! brew services start mongodb-community >/dev/null 2>&1; then
+    brew services start mongodb-community@7.0 >/dev/null 2>&1 || {
+      echo "⚠️  Could not start MongoDB via Homebrew. Please ensure MongoDB is running (e.g., on 127.0.0.1:27017)."
+    }
+  fi
+else
+  echo "⚠️  Homebrew not found. Please ensure MongoDB is running before starting services."
+fi
+echo ""
+
+# ----------------------------
 # Backend services
 # ----------------------------
 run_in_new_tab "${PROJECT_ROOT}/backend/admin-service" "npm install && node server.js"
 run_in_new_tab "${PROJECT_ROOT}/backend/client-service" "npm install && node server.js"
 run_in_new_tab "${PROJECT_ROOT}/backend/llm-driven-booking" "npm install && node server.js"
+run_in_new_tab "${PROJECT_ROOT}/backend/user-authentication" "npm install && node server.js"
 
 # ----------------------------
 # Frontend
