@@ -96,6 +96,10 @@ Fix: Start the Client Service before the frontend
 
 Issue: "CORS errors"
 Fix: Add CORS middleware to both services
+
+Issue: "uriOpen got unexpected input: expected string, got undefined"
+Fix: rename env.example to .env
+
 ------------------------------------------------------------
 TEAM 3720 - SPRINT 1 SUBMISSION
 ------------------------------------------------------------

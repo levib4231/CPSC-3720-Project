@@ -30,6 +30,20 @@ EOF
 # Absolute project root
 PROJECT_ROOT="$(pwd)"
 
+# Ensure .env exists in a given directory, copying from .env.example if needed
+function ensure_env() {
+  local dir="$1"
+  if [[ -f "${dir}/.env" ]]; then
+    return
+  fi
+  if [[ -f "${dir}/.env.example" ]]; then
+    echo "Creating .env from .env.example in ${dir}"
+    cp "${dir}/.env.example" "${dir}/.env"
+  else
+    echo "⚠️  No .env or .env.example found in ${dir}. You may need to create one manually."
+  fi
+}
+
 # ----------------------------
 # MongoDB (via Homebrew)
 # ----------------------------
@@ -50,8 +64,12 @@ echo ""
 # Backend services
 # ----------------------------
 run_in_new_tab "${PROJECT_ROOT}/backend/admin-service" "npm install && node server.js"
+
 run_in_new_tab "${PROJECT_ROOT}/backend/client-service" "npm install && node server.js"
+
 run_in_new_tab "${PROJECT_ROOT}/backend/llm-driven-booking" "npm install && node server.js"
+
+ensure_env "${PROJECT_ROOT}/backend/user-authentication"
 run_in_new_tab "${PROJECT_ROOT}/backend/user-authentication" "npm install && node server.js"
 
 # ----------------------------
