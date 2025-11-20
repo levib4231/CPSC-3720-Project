@@ -9,6 +9,7 @@ export default function ChatWindow() {
   const [interimTranscript, setInterimTranscript] = useState("");
   const messagesEndRef = useRef(null);
 
+
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -62,10 +63,15 @@ export default function ChatWindow() {
     if (!pendingBooking) return;
     setLoading(true);
 
+    const token = sessionStorage.getItem("auth_token");
+
     try {
       const res = await fetch("http://localhost:6002/api/llm/confirm", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           eventName: pendingBooking.event,
           tickets: pendingBooking.tickets,

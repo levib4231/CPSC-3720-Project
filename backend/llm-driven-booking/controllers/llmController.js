@@ -16,6 +16,7 @@
  */
 
 const axios = require("axios");
+const jwt = require("jsonwebtoken");
 const { parseTextToBooking } = require("../services/llmParser");
 
 /**
@@ -79,6 +80,27 @@ exports.parseBookingRequest = async (req, res) => {
  * @sideEffects Performs HTTP requests to the Event Service to complete the booking.
  */
 exports.confirmBooking = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization || "";
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.slice("Bearer ".length)
+      : null;
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized: missing Bearer token." });
+    }
+
+    // Verify token using the same JWT_SECRET as the auth service
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+  } catch (authErr) {
+    console.warn("[LLM Controller] JWT auth failed:", authErr.message);
+    return res
+      .status(401)
+      .json({ error: "Unauthorized: invalid or expired token." });
+  }
   try {
     const { eventName, tickets } = req.body;
     if (!eventName || !tickets) {

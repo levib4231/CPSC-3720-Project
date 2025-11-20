@@ -19,11 +19,16 @@
  * ---------------------------------------------------------
  */
 
+const path = require("path");
+// Load shared secrets (e.g., JWT_SECRET) from project root .env
+require("dotenv").config({ path: path.join(__dirname, "..", "..", ".env") });
+// Then load any service-specific overrides from this folder's .env if present
 require("dotenv").config();
+process.env.PORT = "6002";
+
 const express = require("express");
 const cors = require("cors");
 const llmRoutes = require("./routes/llmRoutes");
-
 const app = express();
 
 // --- Middleware setup ---

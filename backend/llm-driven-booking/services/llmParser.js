@@ -16,6 +16,7 @@
  */
 
 const axios = require("axios");
+const jwt = require("jsonwebtoken");
 
 /**
  * @function parseTextToBooking

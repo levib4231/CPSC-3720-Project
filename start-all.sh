@@ -40,7 +40,7 @@ function ensure_env() {
     echo "Creating .env from .env.example in ${dir}"
     cp "${dir}/.env.example" "${dir}/.env"
   else
-    echo "⚠️  No .env or .env.example found in ${dir}. You may need to create one manually."
+    echo "No .env or .env.example found in ${dir}. You may need to create one manually."
   fi
 }
 
@@ -48,15 +48,15 @@ function ensure_env() {
 # MongoDB (via Homebrew)
 # ----------------------------
 if command -v brew >/dev/null 2>&1; then
-  echo "Ensuring MongoDB is running..."
+  echo "Ensuring MongoDB is running..." 
   # Try common service names; ignore errors and just warn if both fail
   if ! brew services start mongodb-community >/dev/null 2>&1; then
     brew services start mongodb-community@7.0 >/dev/null 2>&1 || {
-      echo "⚠️  Could not start MongoDB via Homebrew. Please ensure MongoDB is running (e.g., on 127.0.0.1:27017)."
+      echo "Could not start MongoDB via Homebrew. Please ensure MongoDB is running (e.g., on 127.0.0.1:27017)."
     }
   fi
 else
-  echo "⚠️  Homebrew not found. Please ensure MongoDB is running before starting services."
+  echo "Homebrew not found. Please ensure MongoDB is running before starting services."
 fi
 echo ""
 
