@@ -7,6 +7,11 @@
     "test": "test"
   },
   "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "sqlite3": "^5.1.7",
+    "axios": "^1.12.2",
     "aggregate-error": "^3.1.0",
     "ansi-regex": "^6.2.2",
     "ansi-styles": "^4.3.0",
