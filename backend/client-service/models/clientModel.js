@@ -55,7 +55,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.log("[ClientModel] Connected to database:", dbPath);
     db.run("PRAGMA foreign_keys = ON");
 
-    // Optional safety: ensure the events table exists so listEvents doesn't fail
+    // Ensure the events table exists
     db.run(
       `CREATE TABLE IF NOT EXISTS events (
          id INTEGER PRIMARY KEY,
@@ -65,15 +65,54 @@ const db = new sqlite3.Database(dbPath, (err) => {
        )`,
       (tableErr) => {
         if (tableErr) {
-          console.error("[ClientModel] Failed to ensure events table exists:", tableErr.message);
-        } else {
-          console.log("[ClientModel] Events table is ready.");
+          console.error(
+            "[ClientModel] Failed to ensure events table exists:",
+            tableErr.message
+          );
+          return;
         }
+
+        console.log("[ClientModel] Events table is ready.");
+
+        // Seed initial events ONLY if table is empty
+        db.get("SELECT COUNT(*) AS count FROM events", (countErr, row) => {
+          if (countErr) {
+            console.error(
+              "[ClientModel] Failed to count events:",
+              countErr.message
+            );
+            return;
+          }
+
+          if (row.count === 0) {
+            console.log("[ClientModel] Seeding initial events...");
+
+            const stmt = db.prepare(
+              "INSERT INTO events (name, date, tickets) VALUES (?, ?, ?)"
+            );
+
+            // Soccer Game – 2025-10-12 – 0 tickets left
+            stmt.run("Soccer Game", "2025-10-12", 0);
+
+            // Football Game – 2025-10-22 – 4474 tickets left
+            stmt.run("Football Game", "2025-10-22", 4474);
+
+            // Homecoming Concert – 2025-11-12 – 130 tickets left
+            stmt.run("Homecoming Concert", "2025-11-12", 130);
+
+            stmt.finalize(() => {
+              console.log("[ClientModel] Initial events seeded.");
+            });
+          } else {
+            console.log(
+              `[ClientModel] Events table already has ${row.count} row(s); skipping seed.`
+            );
+          }
+        });
       }
     );
   }
 });
-
 // ------------------------------------------------------------
 // Functions
 // ------------------------------------------------------------
