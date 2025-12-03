@@ -21,6 +21,12 @@ const clientRoutes = require("./routes/clientRoutes");
 const { close: closeClientDb } = require("./db"); // add or adapt to your db helper
 
 const app = express();
+
+app.use((req, res, next) => {
+  console.log(`[client-service] ${req.method} ${req.url}`);
+  next();
+});
+
 const PORT = process.env.PORT || 6001;
 
 app.use(cors());

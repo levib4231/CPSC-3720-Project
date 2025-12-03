@@ -38,7 +38,10 @@ const {
  * // Example request:
  * GET /api/events
  */
-router.get("/events", listEvents);
+router.get("/events", (req, res, next) => {
+  console.log("[client-service] GET /events");
+  return listEvents(req, res, next);
+});
 
 /**
  * @route   POST /api/events/:id/purchase
@@ -56,7 +59,10 @@ router.get("/events", listEvents);
  * // Example request:
  * POST /api/events/2/purchase
  */
-router.post("/events/:id/purchase", purchaseEvent);
+router.post("/events/:id/purchase", (req, res, next) => {
+  console.log(`[client-service] POST /events/${req.params.id}/purchase`);
+  return purchaseEvent(req, res, next);
+});
 
 /**
  * @route   POST /api/events/llm-book
@@ -82,8 +88,23 @@ router.post("/events/:id/purchase", purchaseEvent);
  * POST /api/events/llm-book
  * Body: { "confirm": true, "eventName": "Jazz Night", "tickets": 2 }
  */
-router.post("/events/llm-book", llmBookEvent);
+router.post("/events/llm-book", (req, res, next) => {
+  console.log("[client-service] POST /events/llm-book");
+  return llmBookEvent(req, res, next);
+});
 
+/**
+ * @route   GET /api/health
+ * @desc    Simple health check endpoint for client-service.
+ * @access  Public
+ */
+router.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "client-service",
+    timestamp: new Date().toISOString(),
+  });
+});
 // ------------------------------------------------------------
 // Export router
 // ------------------------------------------------------------
