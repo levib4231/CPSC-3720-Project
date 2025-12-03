@@ -1,4 +1,4 @@
-TIGERTIX - SPRINT 1 QUICK START GUIDE
+TIGERTIX - QUICK START GUIDE
 
 License
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -12,8 +12,6 @@ TigerTix is a microservice-based ticketing app built with:
 - React.js frontend
 - Node.js + Express backend
 - SQLite shared database
-
-In Sprint 1, we split the backend into Admin and Client services, connected them to a shared database, integrated the React frontend, and added accessibility + concurrency handling.
 
 ------------------------------------------------------------
 PREREQUISITES
@@ -106,9 +104,3 @@ Fix: Add CORS middleware to both services
 
 Issue: "uriOpen got unexpected input: expected string, got undefined"
 Fix: rename env.example to .env
-
-------------------------------------------------------------
-TEAM 3720 - SPRINT 1 SUBMISSION
-------------------------------------------------------------
-Includes:
-Admin Service, Client Service, Shared DB, React Frontend, Accessibility, Concurrency Handling
