@@ -229,3 +229,6 @@ How to run
 
 Reporting
 - Fill tests/TEST_REPORT.md with automated and manual results, include screenshots/logs for manual tests.
+
+Demo Video
+https://drive.google.com/file/d/1lRV5HUgjbO1hOVlghVHLVc1cuMIrAWjk/view?usp=sharing
