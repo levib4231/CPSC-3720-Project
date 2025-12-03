@@ -9,8 +9,8 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import "./App.css";
 import ChatWindow from "./ChatWindow"; // Import chat component
-const EVENTS_API =
-  (process.env.REACT_APP_CLIENT_API?.replace(/\/$/, "") || "http://localhost:6001/api");
+const EVENTS_API = (process.env.REACT_APP_CLIENT_API || "http://localhost:6001/api").replace(/\/$/, "");
+const AUTH_API = (process.env.REACT_APP_AUTH_API || "http://localhost:6003/api/auth").replace(/\/$/, "");
 
 function App() {
   const [events, setEvents] = useState([]);
@@ -93,7 +93,7 @@ function App() {
       }
 
       const res = await fetch(
-        `http://localhost:6001/api/events/${event.id}/purchase`,
+        `${EVENTS_API}/events/${event.id}/purchase`,
         {
           method: "POST",
           headers: {
@@ -128,7 +128,7 @@ function App() {
     e?.preventDefault?.();
     setLoginError("");
     try {
-      const res = await fetch("http://localhost:6003/api/auth/login", {
+      const res = await fetch(`${AUTH_API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -162,7 +162,7 @@ function App() {
     setRegisterMsg("");
 
     try {
-      const res = await fetch("http://localhost:6003/api/auth/register", {
+      const res = await fetch(`${AUTH_API}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -187,7 +187,7 @@ function App() {
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:6003/api/auth/logout", {
+      await fetch(`${AUTH_API}/logout`, {
         method: "POST",
         credentials: "include"
       });

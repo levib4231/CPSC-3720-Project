@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import VoiceInputButton from "./components/voice/VoiceInputButton";
 
+const LLM_API = (process.env.REACT_APP_LLM_API || "http://localhost:6002/api/llm").replace(/\/$/, "");
+
 export default function ChatWindow() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -25,7 +27,7 @@ export default function ChatWindow() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:6002/api/llm/parse", {
+      const res = await fetch(`${LLM_API}/parse`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage }),
@@ -66,7 +68,7 @@ export default function ChatWindow() {
     const token = sessionStorage.getItem("auth_token");
 
     try {
-      const res = await fetch("http://localhost:6002/api/llm/confirm", {
+      const res = await fetch(`${LLM_API}/confirm`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
