@@ -17,8 +17,7 @@ const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
 // Determine which DB file to use
-const DB_PATH =
-  process.env.DB_PATH || path.join(__dirname, "../shared-db/database.sqlite");
+const DB_PATH = path.join(__dirname, "../shared-db/database.sqlite");
 
 // Initialize and open the database connection
 const db = new sqlite3.Database(DB_PATH, (err) => {
