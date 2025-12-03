@@ -69,8 +69,11 @@ Respond with ONLY JSON. Do not include any explanation or extra text.
 
     const userText = `${systemInstructions}\n\nUser request: "${message}"`;
 
+    const model = process.env.GOOGLE_MODEL || "gemini-2.0-flash";
     const url =
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
+      "https://generativelanguage.googleapis.com/v1beta/models/" +
+      model +
+      ":generateContent?key=" +
       encodeURIComponent(apiKey);
 
     const llmResponse = await axios.post(url, {
