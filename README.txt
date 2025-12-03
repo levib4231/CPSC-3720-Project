@@ -81,6 +81,80 @@ Frontend (React):
 - Accessible with keyboard & screen readers
 
 ------------------------------------------------------------
+Environment Variables Setup
+------------------------------------------------------------
+
+Backend Environment Variables
+
+The project uses a shared .env template at the root:
+
+Variables
+PORT
+  Service(s): user-authentication (local)
+  Description: Local port fallback (Railway sets PORT in production)
+  Example: 6003
+
+MONGO_URI
+  Service(s): user-authentication
+  Description: MongoDB connection string (local or Atlas)
+  Example: mongodb://127.0.0.1:27017/user_auth_demo or your Atlas URI
+
+JWT_SECRET
+  Service(s): user-authentication + llm-driven-booking
+  Description: Secret key for signing and verifying JWTs
+  Example: super-secret-key
+
+JWT_EXPIRES
+  Service(s): user-authentication
+  Description: JWT expiration duration
+  Example: 30m
+
+COOKIE_SECURE
+  Service(s): user-authentication
+  Description: Whether auth cookies are marked Secure
+  Example: false (local), true (production)
+
+CLIENT_ORIGIN
+  Service(s): user-authentication
+  Description: Allowed frontend origin for CORS / cookies
+  Example: http://localhost:3000 or your Vercel URL
+
+GOOGLE_API_KEY*
+  Service(s): llm-driven-booking
+  Description: API key for Google AI Studio (Gemini) used to parse natural-language booking requests
+  Example: your-google-api-key-here
+
+CLIENT_SERVICE_API
+  Service(s): llm-driven-booking
+  Description: Base URL for the client-service API used when confirming bookings
+  Example: http://localhost:6001/api or your Railway client-service URL
+
+Frontend Environment Variables
+
+Defined in frontend/.env (local) and in Vercel (production):
+
+Variables
+REACT_APP_CLIENT_API
+  Service(s): React frontend (events + ticket purchase)
+  Description: Base URL for the client-service API
+  Example: http://localhost:6001/api or your Railway client-service URL
+
+REACT_APP_AUTH_API
+  Service(s): React frontend (login + register)
+  Description: Base URL for the user-authentication API
+  Example: http://localhost:6003/api/auth or your Railway user-auth URL
+
+REACT_APP_LLM_API
+  Service(s): React frontend (LLM chat / booking)
+  Description: Base URL for the LLM-driven booking API
+  Example: http://localhost:6002/api/llm or your Railway llm-service URL
+
+REACT_APP_ADMIN_API
+  Service(s): React frontend (admin dashboard)
+  Description: Base URL for the admin-service API
+  Example: http://localhost:6000/api or your Railway admin-service URL
+
+------------------------------------------------------------
 ACCESSIBILITY HIGHLIGHTS
 ------------------------------------------------------------
 - Proper semantic HTML (ul, li, button)
