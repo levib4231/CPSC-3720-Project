@@ -1,111 +1,47 @@
-/**
- * Router: clientRoutes.js
- * ---------------------------------------------------------
- * Purpose:
- *   Defines all HTTP routes for the TigerTix Client Service.
- *   These routes handle public (non-admin) operations such as:
- *   - Viewing available events
- *   - Purchasing event tickets
- *   - Booking tickets using natural language (LLM integration)
- *
- * Standards Addressed:
- *   - File and route-level documentation
- *   - Consistent error-safe structure
- *   - RESTful API conventions
- *   - Clear mapping to controller functions
- * ---------------------------------------------------------
- */
-
-const express = require("express");
-const router = express.Router();
-const {
-  listEvents,
-  purchaseEvent,
-  llmBookEvent, // ← Added new controller method
-} = require("../controllers/clientController");
+const path = require("path");
+const fs = require("fs");
+const sqlite3 = require("sqlite3").verbose();
 
 /**
- * @route   GET /api/events
- * @desc    Retrieves a list of all available events (public endpoint).
- * @access  Public
- * @returns {Array<Object>} Array of event objects:
- *   [
- *     { id: 1, name: "TigerFest", date: "2025-10-15", tickets: 120 },
- *     { id: 2, name: "Homecoming Game", date: "2025-11-02", tickets: 85 }
- *   ]
+ * @constant {string} dbPath
+ * @description Absolute path to the shared TigerTix SQLite database.
  *
- * @example
- * // Example request:
- * GET /api/events
+ * In production (Railway), the project is mounted at /app, so this resolves to:
+ *   /app/backend/shared-db/database.sqlite
+ * We proactively create the parent directory if it does not exist so that
+ * SQLite can create the file instead of failing with SQLITE_CANTOPEN.
  */
-router.get("/events", (req, res, next) => {
-  console.log("[client-service] GET /events");
-  return listEvents(req, res, next);
+const dbDir = path.resolve(__dirname, "../../shared-db");
+if (!fs.existsSync(dbDir)) {
+  console.warn("[ClientModel] DB directory missing, creating:", dbDir);
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+const dbPath = path.join(dbDir, "database.sqlite");
+
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error("[ClientModel] Failed to connect to database:", err.message);
+  } else {
+    console.log("[ClientModel] Connected to database:", dbPath);
+    db.run("PRAGMA foreign_keys = ON");
+
+    // Optional safety: ensure the events table exists so listEvents doesn't fail
+    db.run(
+      `CREATE TABLE IF NOT EXISTS events (
+         id INTEGER PRIMARY KEY,
+         name TEXT NOT NULL,
+         date TEXT NOT NULL,
+         tickets INTEGER NOT NULL
+       )`,
+      (tableErr) => {
+        if (tableErr) {
+          console.error("[ClientModel] Failed to ensure events table exists:", tableErr.message);
+        } else {
+          console.log("[ClientModel] Events table is ready.");
+        }
+      }
+    );
+  }
 });
 
-/**
- * @route   POST /api/events/:id/purchase
- * @desc    Purchases a ticket for a specific event ID.
- * @access  Public
- * @param   {number} id - Event ID parameter in the URL
- * @returns {Object} Confirmation message:
- *   {
- *     message: "Ticket purchased successfully",
- *     event: "TigerFest",
- *     remainingTickets: 84
- *   }
- *
- * @example
- * // Example request:
- * POST /api/events/2/purchase
- */
-router.post("/events/:id/purchase", (req, res, next) => {
-  console.log(`[client-service] POST /events/${req.params.id}/purchase`);
-  return purchaseEvent(req, res, next);
-});
-
-/**
- * @route   POST /api/events/llm-book
- * @desc    Handles natural-language ticket booking using the LLM microservice.
- * @access  Public
- *
- * @body
- *   {string} message  - User input like "Book two tickets for Jazz Night"
- *   {boolean} [confirm] - Whether the user confirmed the suggested booking
- *   {string} [eventName] - Event name to confirm booking
- *   {number} [tickets] - Number of tickets to confirm booking
- *
- * @returns {Object} Dynamic response based on step:
- *   - Step 1 (parse): { step: "confirmation_required", proposedBooking: {...} }
- *   - Step 2 (confirm): { message: "Successfully booked 2 ticket(s) for Jazz Night" }
- *
- * @example
- * // Step 1: Parse request
- * POST /api/events/llm-book
- * Body: { "message": "Book two tickets for Jazz Night" }
- *
- * // Step 2: Confirm booking
- * POST /api/events/llm-book
- * Body: { "confirm": true, "eventName": "Jazz Night", "tickets": 2 }
- */
-router.post("/events/llm-book", (req, res, next) => {
-  console.log("[client-service] POST /events/llm-book");
-  return llmBookEvent(req, res, next);
-});
-
-/**
- * @route   GET /api/health
- * @desc    Simple health check endpoint for client-service.
- * @access  Public
- */
-router.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    service: "client-service",
-    timestamp: new Date().toISOString(),
-  });
-});
-// ------------------------------------------------------------
-// Export router
-// ------------------------------------------------------------
-module.exports = router;
+module.exports = db;
