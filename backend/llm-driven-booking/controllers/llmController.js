@@ -17,7 +17,6 @@
 
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
-const { parseTextToBooking } = require("../services/llmParser");
 
 /**
  * @function parseBookingRequest
@@ -44,10 +43,77 @@ exports.parseBookingRequest = async (req, res) => {
   }
 
   try {
-    // Delegate parsing to LLM service
-    const bookingInfo = await parseTextToBooking(message);
+    const apiKey =
+      process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY || "";
 
-    if (!bookingInfo) {
+    if (!apiKey) {
+      console.error("[LLM Controller] Missing GOOGLE_API_KEY / GEMINI_API_KEY");
+      return res.status(500).json({
+        reply:
+          "LLM is not configured on the server. Please contact the administrator.",
+      });
+    }
+
+    // Build a prompt that asks Gemini to extract a structured booking
+    const systemInstructions = `
+You are a ticket booking parser for a university events system.
+Given a user's natural-language request, extract:
+- "event": the exact event name as a string
+- "tickets": the number of tickets as an integer
+
+If you cannot confidently identify an event name or ticket count, respond with:
+{"event": null, "tickets": null}
+
+Respond with ONLY JSON. Do not include any explanation or extra text.
+`;
+
+    const userText = `${systemInstructions}\n\nUser request: "${message}"`;
+
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" +
+      encodeURIComponent(apiKey);
+
+    const llmResponse = await axios.post(url, {
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: userText }],
+        },
+      ],
+    });
+
+    const candidate =
+      llmResponse.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+    let parsed;
+    try {
+      // Some models wrap JSON in ```json fences; strip them if present
+      const cleaned = candidate
+        .replace(/^```json\s*/i, "")
+        .replace(/```\s*$/i, "");
+      parsed = JSON.parse(cleaned);
+    } catch (parseErr) {
+      console.warn(
+        "[LLM Controller] Failed to parse Gemini JSON:",
+        parseErr.message,
+        "raw:",
+        candidate
+      );
+      return res.status(200).json({
+        reply: "Sorry, I couldn't understand your booking request.",
+        bookingInfo: null,
+      });
+    }
+
+    const bookingInfo = {
+      event: parsed.event || null,
+      tickets:
+        typeof parsed.tickets === "number"
+          ? parsed.tickets
+          : parseInt(parsed.tickets, 10) || null,
+    };
+
+    if (!bookingInfo.event || !bookingInfo.tickets) {
       return res.status(200).json({
         reply: "Sorry, I couldn't understand your booking request.",
         bookingInfo: null,
@@ -56,12 +122,15 @@ exports.parseBookingRequest = async (req, res) => {
 
     const reply = `Got it! You want to book ${bookingInfo.tickets} ticket(s) for "${bookingInfo.event}". Please confirm to proceed.`;
 
-    res.status(200).json({ reply, bookingInfo });
+    return res.status(200).json({ reply, bookingInfo });
   } catch (err) {
-    console.error("[LLM Controller] LLM error:", err);
-    res
-      .status(500)
-      .json({ reply: "Oops! Something went wrong parsing your request." });
+    console.error(
+      "[LLM Controller] LLM error:",
+      err.response?.data || err.message
+    );
+    return res.status(500).json({
+      reply: "Oops! Something went wrong parsing your request.",
+    });
   }
 };
 
